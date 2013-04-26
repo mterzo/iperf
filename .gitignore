@@ -1,0 +1,11 @@
+*.[ao]
+Makefile
+autom4te.cache
+*.swp
+src/iperf
+.deps
+config.h
+config.log
+config.status
+include/iperf-int.h
+stamp-h1
