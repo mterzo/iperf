@@ -42,19 +42,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifndef _MSC_VER /* Visual C++ doesn't have unistd.h */
-    #include <unistd.h>
+#include <unistd.h>
 #endif
 #include <string.h>
 
 #ifndef _
 /* This is for other GNU distributions with internationalized messages.
    When compiling libc, the _ macro is predefined.  */
-    #ifdef HAVE_LIBINTL_H
-        #include <libintl.h>
-        #define _(msgid)	gettext (msgid)
-    #else
-        #define _(msgid)	(msgid)
-    #endif
+#ifdef HAVE_LIBINTL_H
+#include <libintl.h>
+#define _(msgid)	gettext (msgid)
+#else
+#define _(msgid)	(msgid)
+#endif
 #endif
 
 /* This version of `gnu_getopt' appears to the caller like standard
@@ -168,10 +168,12 @@ static char *posixly_correct;
    whose names are inconsistent.  */
 
 static char *
-my_index( const char* str, int chr ) {
+my_index( const char* str, int chr )
+{
     while ( *str ) {
-        if ( *str == chr )
+        if ( *str == chr ) {
             return(char *) str;
+        }
         str++;
     }
     return 0;
@@ -199,7 +201,8 @@ static int last_nonopt;
 static void exchange( char **argv );
 
 static void
-exchange( char **argv ) {
+exchange( char **argv )
+{
     int bottom = first_nonopt;
     int middle = last_nonopt;
     int top = gnu_optind;
@@ -256,7 +259,8 @@ _gnu_getopt_initialize( int argc,
 static const char *
 _gnu_getopt_initialize( int argc,
                         char *const * argv,
-                        const char *optstring ) {
+                        const char *optstring )
+{
     /* Start processing options with ARGV-element 1 (since ARGV-element 0
        is the program name); the sequence of previously skipped
        non-option ARGV-elements is empty.  */
@@ -275,10 +279,11 @@ _gnu_getopt_initialize( int argc,
     } else if ( optstring[0] == '+' ) {
         ordering = REQUIRE_ORDER;
         ++optstring;
-    } else if ( posixly_correct != NULL )
+    } else if ( posixly_correct != NULL ) {
         ordering = REQUIRE_ORDER;
-    else
+    } else {
         ordering = PERMUTE;
+    }
 
     return optstring;
 }
@@ -345,7 +350,8 @@ _gnu_getopt_internal( int argc,
                       const char *optstring,
                       const struct option *longopts,
                       int *longind,
-                      int long_only ) {
+                      int long_only )
+{
     gnu_optarg = NULL;
 
     if ( !__gnu_getopt_initialized || gnu_optind == 0 ) {
@@ -365,69 +371,76 @@ _gnu_getopt_internal( int argc,
         /* Advance to the next ARGV-element.  */
 
         /* Give FIRST_NONOPT & LAST_NONOPT rational values if OPTIND has been
-       moved back by the user (who may also have changed the arguments).  */
-        if ( last_nonopt > gnu_optind )
+        moved back by the user (who may also have changed the arguments).  */
+        if ( last_nonopt > gnu_optind ) {
             last_nonopt = gnu_optind;
-        if ( first_nonopt > gnu_optind )
+        }
+        if ( first_nonopt > gnu_optind ) {
             first_nonopt = gnu_optind;
+        }
 
         if ( ordering == PERMUTE ) {
             /* If we have just processed some options following some non-options,
                exchange them so that the options come first.  */
 
-            if ( first_nonopt != last_nonopt && last_nonopt != gnu_optind )
+            if ( first_nonopt != last_nonopt && last_nonopt != gnu_optind ) {
                 exchange ((char **) argv);
-            else if ( last_nonopt != gnu_optind )
+            } else if ( last_nonopt != gnu_optind ) {
                 first_nonopt = gnu_optind;
+            }
 
             /* Skip any additional non-options
                and extend the range of non-options previously skipped.  */
 
-            while ( gnu_optind < argc && NONOPTION_P )
+            while ( gnu_optind < argc && NONOPTION_P ) {
                 gnu_optind++;
+            }
             last_nonopt = gnu_optind;
         }
 
         /* The special ARGV-element `--' means premature end of options.
-       Skip it like a null option,
-       then exchange with previous non-options as if it were an option,
-       then skip everything else like a non-option.  */
+        Skip it like a null option,
+        then exchange with previous non-options as if it were an option,
+        then skip everything else like a non-option.  */
 
         if ( gnu_optind != argc && !strcmp (argv[gnu_optind], "--") ) {
             gnu_optind++;
 
-            if ( first_nonopt != last_nonopt && last_nonopt != gnu_optind )
+            if ( first_nonopt != last_nonopt && last_nonopt != gnu_optind ) {
                 exchange ((char **) argv);
-            else if ( first_nonopt == last_nonopt )
+            } else if ( first_nonopt == last_nonopt ) {
                 first_nonopt = gnu_optind;
+            }
             last_nonopt = argc;
 
             gnu_optind = argc;
         }
 
         /* If we have done all the ARGV-elements, stop the scan
-       and back over any non-options that we skipped and permuted.  */
+        and back over any non-options that we skipped and permuted.  */
 
         if ( gnu_optind == argc ) {
             /* Set the next-arg-index to point at the non-options
                that we previously skipped, so the caller will digest them.  */
-            if ( first_nonopt != last_nonopt )
+            if ( first_nonopt != last_nonopt ) {
                 gnu_optind = first_nonopt;
+            }
             return -1;
         }
 
         /* If we have come to a non-option and did not permute it,
-       either stop the scan or describe it to the caller and pass it by.  */
+        either stop the scan or describe it to the caller and pass it by.  */
 
         if ( NONOPTION_P ) {
-            if ( ordering == REQUIRE_ORDER )
+            if ( ordering == REQUIRE_ORDER ) {
                 return -1;
+            }
             gnu_optarg = argv[gnu_optind++];
             return 1;
         }
 
         /* We have found another option-ARGV-element.
-       Skip the initial punctuation.  */
+        Skip the initial punctuation.  */
 
         nextchar = (argv[gnu_optind] + 1
                     + (longopts != NULL && argv[gnu_optind][1] == '-'));
@@ -436,21 +449,21 @@ _gnu_getopt_internal( int argc,
     /* Decode the current option-ARGV-element.  */
 
     /* Check whether the ARGV-element is a long option.
-  
+
        If long_only and the ARGV-element has the form "-f", where f is
        a valid short option, don't consider it an abbreviated form of
        a long option that starts with f.  Otherwise there would be no
        way to give the -f short option.
-  
+
        On the other hand, if there's a long option "fubar" and
        the ARGV-element is "-fu", do consider that an abbreviation of
        the long option, just like "--fu", and not "-f" with arg "u".
-  
+
        This distinction seems to be the most useful approach.  */
 
     if ( longopts != NULL
-         && (argv[gnu_optind][1] == '-'
-             || (long_only && (argv[gnu_optind][2] || !my_index (optstring, argv[gnu_optind][1])))) ) {
+            && (argv[gnu_optind][1] == '-'
+                || (long_only && (argv[gnu_optind][2] || !my_index (optstring, argv[gnu_optind][1])))) ) {
         char *nameend;
         const struct option *p;
         const struct option *pfound = NULL;
@@ -463,11 +476,11 @@ _gnu_getopt_internal( int argc,
             /* Do nothing.  */ ;
 
         /* Test all long options for either exact match
-       or abbreviated matches.  */
+        or abbreviated matches.  */
         for ( p = longopts, option_index = 0; p->name; p++, option_index++ )
             if ( !strncmp (p->name, nextchar, nameend - nextchar) ) {
                 if ( (unsigned int) (nameend - nextchar)
-                     == (unsigned int) strlen (p->name) ) {
+                        == (unsigned int) strlen (p->name) ) {
                     /* Exact match found.  */
                     pfound = p;
                     indfound = option_index;
@@ -479,7 +492,9 @@ _gnu_getopt_internal( int argc,
                     indfound = option_index;
                 } else
                     /* Second or later nonexact match found.  */
+                {
                     ambig = 1;
+                }
             }
 
         if ( ambig && !exact ) {
@@ -497,10 +512,10 @@ _gnu_getopt_internal( int argc,
             gnu_optind++;
             if ( *nameend ) {
                 /* Don't test has_arg with >, because some C compilers don't
-               allow it to be used on enums.  */
-                if ( pfound->has_arg )
+                allow it to be used on enums.  */
+                if ( pfound->has_arg ) {
                     gnu_optarg = nameend + 1;
-                else {
+                } else {
                     if ( gnu_opterr ) {
                         if ( argv[gnu_optind - 1][1] == '-' ) {
                             /* --option */
@@ -521,9 +536,9 @@ _gnu_getopt_internal( int argc,
                     return '?';
                 }
             } else if ( pfound->has_arg == 1 ) {
-                if ( gnu_optind < argc )
+                if ( gnu_optind < argc ) {
                     gnu_optarg = argv[gnu_optind++];
-                else {
+                } else {
                     if ( gnu_opterr )
                         fprintf (stderr,
                                  _("%s: option `%s' requires an argument\n"),
@@ -534,8 +549,9 @@ _gnu_getopt_internal( int argc,
                 }
             }
             nextchar += strlen (nextchar);
-            if ( longind != NULL )
+            if ( longind != NULL ) {
                 *longind = option_index;
+            }
             if ( pfound->flag ) {
                 *(pfound->flag) = pfound->val;
                 return 0;
@@ -544,11 +560,11 @@ _gnu_getopt_internal( int argc,
         }
 
         /* Can't find it as a long option.  If this is not gnu_getopt_long_only,
-       or the option starts with '--' or is not a valid short
-       option, then it's an error.
-       Otherwise interpret it as a short option.  */
+        or the option starts with '--' or is not a valid short
+        option, then it's an error.
+        Otherwise interpret it as a short option.  */
         if ( !long_only || argv[gnu_optind][1] == '-'
-             || my_index (optstring, *nextchar) == NULL ) {
+                || my_index (optstring, *nextchar) == NULL ) {
             if ( gnu_opterr ) {
                 if ( argv[gnu_optind][1] == '-' )
                     /* --option */
@@ -573,8 +589,9 @@ _gnu_getopt_internal( int argc,
         char *temp = my_index (optstring, c);
 
         /* Increment `gnu_optind' when we start to process its last character.  */
-        if ( *nextchar == '\0' )
+        if ( *nextchar == '\0' ) {
             ++gnu_optind;
+        }
 
         if ( temp == NULL || c == ':' ) {
             if ( gnu_opterr ) {
@@ -612,15 +629,18 @@ _gnu_getopt_internal( int argc,
                              argv[0], c);
                 }
                 gnu_optopt = c;
-                if ( optstring[0] == ':' )
+                if ( optstring[0] == ':' ) {
                     c = ':';
-                else
+                } else {
                     c = '?';
+                }
                 return c;
             } else
                 /* We already incremented `gnu_optind' once;
                    increment it again when taking next ARGV-elt as argument.  */
+            {
                 gnu_optarg = argv[gnu_optind++];
+            }
 
             /* gnu_optarg is now the argument, see if it's in the
                table of longopts.  */
@@ -644,7 +664,9 @@ _gnu_getopt_internal( int argc,
                         indfound = option_index;
                     } else
                         /* Second or later nonexact match found.  */
+                    {
                         ambig = 1;
+                    }
                 }
             if ( ambig && !exact ) {
                 if ( gnu_opterr )
@@ -659,9 +681,9 @@ _gnu_getopt_internal( int argc,
                 if ( *nameend ) {
                     /* Don't test has_arg with >, because some C compilers don't
                        allow it to be used on enums.  */
-                    if ( pfound->has_arg )
+                    if ( pfound->has_arg ) {
                         gnu_optarg = nameend + 1;
-                    else {
+                    } else {
                         if ( gnu_opterr )
                             fprintf (stderr, _("\
 %s: option `-W %s' doesn't allow an argument\n"),
@@ -671,9 +693,9 @@ _gnu_getopt_internal( int argc,
                         return '?';
                     }
                 } else if ( pfound->has_arg == 1 ) {
-                    if ( gnu_optind < argc )
+                    if ( gnu_optind < argc ) {
                         gnu_optarg = argv[gnu_optind++];
-                    else {
+                    } else {
                         if ( gnu_opterr )
                             fprintf (stderr,
                                      _("%s: option `%s' requires an argument\n"),
@@ -683,8 +705,9 @@ _gnu_getopt_internal( int argc,
                     }
                 }
                 nextchar += strlen (nextchar);
-                if ( longind != NULL )
+                if ( longind != NULL ) {
                     *longind = option_index;
+                }
                 if ( pfound->flag ) {
                     *(pfound->flag) = pfound->val;
                     return 0;
@@ -700,8 +723,9 @@ _gnu_getopt_internal( int argc,
                 if ( *nextchar != '\0' ) {
                     gnu_optarg = nextchar;
                     gnu_optind++;
-                } else
+                } else {
                     gnu_optarg = NULL;
+                }
                 nextchar = NULL;
             } else {
                 /* This is an option that requires an argument.  */
@@ -718,14 +742,17 @@ _gnu_getopt_internal( int argc,
                                  argv[0], c);
                     }
                     gnu_optopt = c;
-                    if ( optstring[0] == ':' )
+                    if ( optstring[0] == ':' ) {
                         c = ':';
-                    else
+                    } else {
                         c = '?';
+                    }
                 } else
                     /* We already incremented `gnu_optind' once;
-                   increment it again when taking next ARGV-elt as argument.  */
+                    increment it again when taking next ARGV-elt as argument.  */
+                {
                     gnu_optarg = argv[gnu_optind++];
+                }
                 nextchar = NULL;
             }
         }
@@ -736,7 +763,8 @@ _gnu_getopt_internal( int argc,
 int
 gnu_getopt ( int argc,
              char *const *argv,
-             const char *optstring ) {
+             const char *optstring )
+{
     return _gnu_getopt_internal (argc, argv, optstring,
                                  (const struct option *) 0,
                                  (int *) 0,
@@ -758,17 +786,18 @@ main (argc, argv)
 int argc;
 char **argv;
 {
-int c;
-int digit_optind = 0;
+    int c;
+    int digit_optind = 0;
 
-while ( 1 ) {
-    int this_option_optind = gnu_optind ? gnu_optind : 1;
+    while ( 1 ) {
+        int this_option_optind = gnu_optind ? gnu_optind : 1;
 
-    c = gnu_getopt (argc, argv, "abc:d:0123456789");
-    if ( c == -1 )
-        break;
+        c = gnu_getopt (argc, argv, "abc:d:0123456789");
+        if ( c == -1 ) {
+            break;
+        }
 
-    switch ( c ) {
+        switch ( c ) {
         case '0':
         case '1':
         case '2':
@@ -779,8 +808,9 @@ while ( 1 ) {
         case '7':
         case '8':
         case '9':
-            if ( digit_optind != 0 && digit_optind != this_option_optind )
+            if ( digit_optind != 0 && digit_optind != this_option_optind ) {
                 fprintf ( stderr, "digits occur in two different argv-elements.\n");
+            }
             digit_optind = this_option_optind;
             fprintf ( stderr, "option %c\n", c);
             break;
@@ -802,17 +832,18 @@ while ( 1 ) {
 
         default:
             fprintf ( stderr, "?? gnu_getopt returned character code 0%o ??\n", c);
+        }
     }
-}
 
-if ( gnu_optind < argc ) {
-    fprintf (stderr, "non-option ARGV-elements: ");
-    while ( gnu_optind < argc )
-        fprintf ( stderr, "%s ", argv[gnu_optind++]);
-    fprintf ( stderr, "\n");
-}
+    if ( gnu_optind < argc ) {
+        fprintf (stderr, "non-option ARGV-elements: ");
+        while ( gnu_optind < argc ) {
+            fprintf ( stderr, "%s ", argv[gnu_optind++]);
+        }
+        fprintf ( stderr, "\n");
+    }
 
-exit (0);
+    exit (0);
 }
 
 #endif /* TEST */

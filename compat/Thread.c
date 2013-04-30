@@ -1,48 +1,48 @@
-/*--------------------------------------------------------------- 
- * Copyright (c) 1999,2000,2001,2002,2003                              
- * The Board of Trustees of the University of Illinois            
- * All Rights Reserved.                                           
- *--------------------------------------------------------------- 
- * Permission is hereby granted, free of charge, to any person    
- * obtaining a copy of this software (Iperf) and associated       
- * documentation files (the "Software"), to deal in the Software  
- * without restriction, including without limitation the          
- * rights to use, copy, modify, merge, publish, distribute,        
- * sublicense, and/or sell copies of the Software, and to permit     
+/*---------------------------------------------------------------
+ * Copyright (c) 1999,2000,2001,2002,2003
+ * The Board of Trustees of the University of Illinois
+ * All Rights Reserved.
+ *---------------------------------------------------------------
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software (Iperf) and associated
+ * documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit
  * persons to whom the Software is furnished to do
- * so, subject to the following conditions: 
+ * so, subject to the following conditions:
  *
- *     
- * Redistributions of source code must retain the above 
- * copyright notice, this list of conditions and 
- * the following disclaimers. 
  *
- *     
- * Redistributions in binary form must reproduce the above 
- * copyright notice, this list of conditions and the following 
- * disclaimers in the documentation and/or other materials 
- * provided with the distribution. 
- * 
- *     
- * Neither the names of the University of Illinois, NCSA, 
- * nor the names of its contributors may be used to endorse 
+ * Redistributions of source code must retain the above
+ * copyright notice, this list of conditions and
+ * the following disclaimers.
+ *
+ *
+ * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following
+ * disclaimers in the documentation and/or other materials
+ * provided with the distribution.
+ *
+ *
+ * Neither the names of the University of Illinois, NCSA,
+ * nor the names of its contributors may be used to endorse
  * or promote products derived from this Software without
- * specific prior written permission. 
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE CONTIBUTORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * specific prior written permission.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE CONTIBUTORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * ________________________________________________________________
- * National Laboratory for Applied Network Research 
- * National Center for Supercomputing Applications 
- * University of Illinois at Urbana-Champaign 
+ * National Laboratory for Applied Network Research
+ * National Center for Supercomputing Applications
+ * University of Illinois at Urbana-Champaign
  * http://www.ncsa.uiuc.edu
- * ________________________________________________________________ 
+ * ________________________________________________________________
  *
  * Thread.c
  * by Kevin Gibbs <kgibbs@nlanr.net>
@@ -52,10 +52,10 @@
  * by Mark Gates <mgates@nlanr.net>
  * -------------------------------------------------------------------
  * The thread subsystem is responsible for all thread functions. It
- * provides a thread implementation agnostic interface to Iperf. If 
+ * provides a thread implementation agnostic interface to Iperf. If
  * threads are not available (HAVE_THREAD is undefined), thread_start
- * does not start a new thread but just launches the specified object 
- * in the current thread. Everything that defines a thread of 
+ * does not start a new thread but just launches the specified object
+ * in the current thread. Everything that defines a thread of
  * execution in Iperf is contained in an thread_Settings structure. To
  * start a thread simply pass one such structure into thread_start.
  * -------------------------------------------------------------------
@@ -86,7 +86,7 @@ extern "C" {
 int thread_sNum = 0;
 // number of non-terminating running threads (ie listener thread)
 int nonterminating_num = 0;
-// condition to protect updating the above and alerting on 
+// condition to protect updating the above and alerting on
 // changes to above
 Condition thread_sNum_cond;
 
@@ -95,7 +95,8 @@ Condition thread_sNum_cond;
  * Initialize the thread subsystems variables and set the concurrency
  * level in solaris.
  * ------------------------------------------------------------------- */
-void thread_init( ) {
+void thread_init( )
+{
     Condition_Initialize( &thread_sNum_cond );
 #if defined( sun )
     /* Solaris apparently doesn't default to timeslicing threads,
@@ -109,7 +110,8 @@ void thread_init( ) {
 /* -------------------------------------------------------------------
  * Destroy the thread subsystems variables.
  * ------------------------------------------------------------------- */
-void thread_destroy( ) {
+void thread_destroy( )
+{
     Condition_Destroy( &thread_sNum_cond );
 }
 
@@ -117,7 +119,8 @@ void thread_destroy( ) {
  * Start the specified object's thread execution. Increments thread
  * count, spawns new thread, and stores thread ID.
  * ------------------------------------------------------------------- */
-void thread_start( struct thread_Settings* thread ) {
+void thread_start( struct thread_Settings* thread )
+{
 
     // Make sure this object has not been started already
     if ( thread_equalid( thread->mTID, thread_zeroid() ) ) {
@@ -170,7 +173,8 @@ void thread_start( struct thread_Settings* thread ) {
  * Stop the specified object's thread execution (if any) immediately.
  * Decrements thread count and resets the thread ID.
  * ------------------------------------------------------------------- */
-void thread_stop( struct thread_Settings* thread ) {
+void thread_stop( struct thread_Settings* thread )
+{
 
 #ifdef HAVE_THREAD
     // Make sure we have been started
@@ -218,47 +222,48 @@ void thread_stop( struct thread_Settings* thread ) {
 } // end Stop
 
 /* -------------------------------------------------------------------
- * This function is the entry point for new threads created in 
- * thread_start. 
+ * This function is the entry point for new threads created in
+ * thread_start.
  * ------------------------------------------------------------------- */
 #if   defined( HAVE_WIN32_THREAD )
 DWORD WINAPI
 #else
 void*
 #endif
-thread_run_wrapper( void* paramPtr ) {
+thread_run_wrapper( void* paramPtr )
+{
     struct thread_Settings* thread = (struct thread_Settings*) paramPtr;
 
     // which type of object are we
     switch ( thread->mThreadMode ) {
-        case kMode_Server:
-            {
-                /* Spawn a Server thread with these settings */
-                server_spawn( thread );
-            } break;
-        case kMode_Client:
-            {
-                /* Spawn a Client thread with these settings */
-                client_spawn( thread );
-            } break;
-        case kMode_Reporter:
-            {
-                /* Spawn a Reporter thread with these settings */
-                reporter_spawn( thread );
-            } break;
-        case kMode_Listener:
-            {
-                // Increment the non-terminating thread count
-                thread_register_nonterm();
-                /* Spawn a Listener thread with these settings */
-                listener_spawn( thread );
-                // Decrement the non-terminating thread count
-                thread_unregister_nonterm();
-            } break;
-        default:
-            {
-                FAIL(1, "Unknown Thread Type!\n", thread);
-            } break;
+    case kMode_Server: {
+        /* Spawn a Server thread with these settings */
+        server_spawn( thread );
+    }
+    break;
+    case kMode_Client: {
+        /* Spawn a Client thread with these settings */
+        client_spawn( thread );
+    }
+    break;
+    case kMode_Reporter: {
+        /* Spawn a Reporter thread with these settings */
+        reporter_spawn( thread );
+    }
+    break;
+    case kMode_Listener: {
+        // Increment the non-terminating thread count
+        thread_register_nonterm();
+        /* Spawn a Listener thread with these settings */
+        listener_spawn( thread );
+        // Decrement the non-terminating thread count
+        thread_unregister_nonterm();
+    }
+    break;
+    default: {
+        FAIL(1, "Unknown Thread Type!\n", thread);
+    }
+    break;
     }
 
 #ifdef HAVE_POSIX_THREAD
@@ -290,7 +295,8 @@ thread_run_wrapper( void* paramPtr ) {
  * thread count being accurate and the threads sending a condition
  * signal when they terminate.
  * ------------------------------------------------------------------- */
-void thread_joinall( void ) {
+void thread_joinall( void )
+{
     Condition_Lock( thread_sNum_cond );
     while ( thread_sNum > 0 ) {
         Condition_Wait( &thread_sNum_cond );
@@ -304,7 +310,8 @@ void thread_joinall( void ) {
  * are equal. On some OS's nthread_t is a struct so == will not work.
  * TODO use pthread_equal. Any Win32 equivalent??
  * ------------------------------------------------------------------- */
-int thread_equalid( nthread_t inLeft, nthread_t inRight ) {
+int thread_equalid( nthread_t inLeft, nthread_t inRight )
+{
     return(memcmp( &inLeft, &inRight, sizeof(inLeft)) == 0);
 }
 
@@ -313,7 +320,8 @@ int thread_equalid( nthread_t inLeft, nthread_t inRight ) {
  * so == 0 will not work.
  * [static]
  * ------------------------------------------------------------------- */
-nthread_t thread_zeroid( void ) {
+nthread_t thread_zeroid( void )
+{
     nthread_t a;
     memset( &a, 0, sizeof(a));
     return a;
@@ -325,7 +333,8 @@ nthread_t thread_zeroid( void ) {
  * This is utilized by the reporter thread which knows when it
  * is ok to quit (aka no pending reports).
  * ------------------------------------------------------------------- */
-void thread_setignore( ) {
+void thread_setignore( )
+{
     Condition_Lock( thread_sNum_cond );
     thread_sNum--;
     Condition_Signal( &thread_sNum_cond );
@@ -338,7 +347,8 @@ void thread_setignore( ) {
  * This is utilized by the reporter thread which knows when it
  * is ok to quit (aka no pending reports).
  * ------------------------------------------------------------------- */
-void thread_unsetignore( void ) {
+void thread_unsetignore( void )
+{
     Condition_Lock( thread_sNum_cond );
     thread_sNum++;
     Condition_Signal( &thread_sNum_cond );
@@ -349,9 +359,10 @@ void thread_unsetignore( void ) {
  * set a thread to be non-terminating, so if you cancel through
  * Ctrl-C they can be ignored by the joinall.
  * ------------------------------------------------------------------- */
-void thread_register_nonterm( void ) {
+void thread_register_nonterm( void )
+{
     Condition_Lock( thread_sNum_cond );
-    nonterminating_num++; 
+    nonterminating_num++;
     Condition_Unlock( thread_sNum_cond );
 }
 
@@ -359,14 +370,15 @@ void thread_register_nonterm( void ) {
  * unset a thread from being non-terminating, so if you cancel through
  * Ctrl-C they can be ignored by the joinall.
  * ------------------------------------------------------------------- */
-void thread_unregister_nonterm( void ) {
+void thread_unregister_nonterm( void )
+{
     Condition_Lock( thread_sNum_cond );
     if ( nonterminating_num == 0 ) {
         // nonterminating has been released with release_nonterm
         // Add back to the threads to wait on
         thread_sNum++;
     } else {
-        nonterminating_num--; 
+        nonterminating_num--;
     }
     Condition_Unlock( thread_sNum_cond );
 }
@@ -377,7 +389,8 @@ void thread_unregister_nonterm( void ) {
  * the joinall will complete. This is called on a Ctrl-C input. It is
  * also used by the -P usage on the server side
  * ------------------------------------------------------------------- */
-int thread_release_nonterm( int interrupt ) {
+int thread_release_nonterm( int interrupt )
+{
     Condition_Lock( thread_sNum_cond );
     thread_sNum -= nonterminating_num;
     if ( thread_sNum > 1 && nonterminating_num > 0 && interrupt != 0 ) {
@@ -393,7 +406,8 @@ int thread_release_nonterm( int interrupt ) {
  * Return the number of threads currently running (doesn't include
  * active threads that have called setdaemon (aka reporter thread))
  * ------------------------------------------------------------------- */
-int thread_numuserthreads( void ) {
+int thread_numuserthreads( void )
+{
     return thread_sNum;
 }
 
@@ -402,7 +416,8 @@ int thread_numuserthreads( void ) {
  * Allow another thread to execute. If no other threads are runable this
  * is not guarenteed to actually rest.
  * ------------------------------------------------------------------- */
-void thread_rest ( void ) {
+void thread_rest ( void )
+{
 #if defined( HAVE_THREAD )
 #if defined( HAVE_POSIX_THREAD )
 #else // Win32

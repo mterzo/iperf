@@ -1,48 +1,48 @@
-/*--------------------------------------------------------------- 
- * Copyright (c) 1999,2000,2001,2002,2003                              
- * The Board of Trustees of the University of Illinois            
- * All Rights Reserved.                                           
- *--------------------------------------------------------------- 
- * Permission is hereby granted, free of charge, to any person    
- * obtaining a copy of this software (Iperf) and associated       
- * documentation files (the "Software"), to deal in the Software  
- * without restriction, including without limitation the          
- * rights to use, copy, modify, merge, publish, distribute,        
- * sublicense, and/or sell copies of the Software, and to permit     
+/*---------------------------------------------------------------
+ * Copyright (c) 1999,2000,2001,2002,2003
+ * The Board of Trustees of the University of Illinois
+ * All Rights Reserved.
+ *---------------------------------------------------------------
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software (Iperf) and associated
+ * documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit
  * persons to whom the Software is furnished to do
- * so, subject to the following conditions: 
+ * so, subject to the following conditions:
  *
- *     
- * Redistributions of source code must retain the above 
- * copyright notice, this list of conditions and 
- * the following disclaimers. 
  *
- *     
- * Redistributions in binary form must reproduce the above 
- * copyright notice, this list of conditions and the following 
- * disclaimers in the documentation and/or other materials 
- * provided with the distribution. 
- * 
- *     
- * Neither the names of the University of Illinois, NCSA, 
- * nor the names of its contributors may be used to endorse 
+ * Redistributions of source code must retain the above
+ * copyright notice, this list of conditions and
+ * the following disclaimers.
+ *
+ *
+ * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following
+ * disclaimers in the documentation and/or other materials
+ * provided with the distribution.
+ *
+ *
+ * Neither the names of the University of Illinois, NCSA,
+ * nor the names of its contributors may be used to endorse
  * or promote products derived from this Software without
- * specific prior written permission. 
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE CONTIBUTORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ * specific prior written permission.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE CONTIBUTORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * ________________________________________________________________
- * National Laboratory for Applied Network Research 
- * National Center for Supercomputing Applications 
- * University of Illinois at Urbana-Champaign 
+ * National Laboratory for Applied Network Research
+ * National Center for Supercomputing Applications
+ * University of Illinois at Urbana-Champaign
  * http://www.ncsa.uiuc.edu
- * ________________________________________________________________ 
+ * ________________________________________________________________
  *
  * ReportDefault.c
  * by Kevin Gibbs <kgibbs@nlanr.net>
@@ -66,13 +66,14 @@ extern "C" {
 /*
  * Prints transfer reports in default style
  */
-void reporter_printstats( Transfer_Info *stats ) {
+void reporter_printstats( Transfer_Info *stats )
+{
     static char header_printed = 0;
 
     byte_snprintf( buffer, sizeof(buffer)/2, (double) stats->TotalLen,
                    toupper( stats->mFormat));
     byte_snprintf( &buffer[sizeof(buffer)/2], sizeof(buffer)/2,
-                   stats->TotalLen / (stats->endTime - stats->startTime), 
+                   stats->TotalLen / (stats->endTime - stats->startTime),
                    stats->mFormat);
 
     if ( stats->mUDP != (char)kMode_Server ) {
@@ -81,8 +82,8 @@ void reporter_printstats( Transfer_Info *stats ) {
             printf( "%s", report_bw_header);
             header_printed = 1;
         }
-        printf( report_bw_format, stats->transferID, 
-                stats->startTime, stats->endTime, 
+        printf( report_bw_format, stats->transferID,
+                stats->startTime, stats->endTime,
                 buffer, &buffer[sizeof(buffer)/2] );
     } else {
         // UDP Reporting
@@ -90,19 +91,19 @@ void reporter_printstats( Transfer_Info *stats ) {
             printf( "%s", report_bw_jitter_loss_header);
             header_printed = 1;
         }
-        printf( report_bw_jitter_loss_format, stats->transferID, 
-                stats->startTime, stats->endTime, 
+        printf( report_bw_jitter_loss_format, stats->transferID,
+                stats->startTime, stats->endTime,
                 buffer, &buffer[sizeof(buffer)/2],
                 stats->jitter*1000.0, stats->cntError, stats->cntDatagrams,
                 (100.0 * stats->cntError) / stats->cntDatagrams );
         if ( stats->cntOutofOrder > 0 ) {
             printf( report_outoforder,
-                    stats->transferID, stats->startTime, 
+                    stats->transferID, stats->startTime,
                     stats->endTime, stats->cntOutofOrder );
         }
     }
     if ( stats->free == 1 && stats->mUDP == (char)kMode_Client ) {
-        printf( report_datagrams, stats->transferID, stats->cntDatagrams ); 
+        printf( report_datagrams, stats->transferID, stats->cntDatagrams );
     }
 }
 
@@ -110,41 +111,43 @@ void reporter_printstats( Transfer_Info *stats ) {
 /*
  * Prints multiple transfer reports in default style
  */
-void reporter_multistats( Transfer_Info *stats ) {
+void reporter_multistats( Transfer_Info *stats )
+{
 
     byte_snprintf( buffer, sizeof(buffer)/2, (double) stats->TotalLen,
                    toupper( stats->mFormat));
     byte_snprintf( &buffer[sizeof(buffer)/2], sizeof(buffer)/2,
-                   stats->TotalLen / (stats->endTime - stats->startTime), 
+                   stats->TotalLen / (stats->endTime - stats->startTime),
                    stats->mFormat);
 
     if ( stats->mUDP != (char)kMode_Server ) {
         // TCP Reporting
-        printf( report_sum_bw_format, 
-                stats->startTime, stats->endTime, 
+        printf( report_sum_bw_format,
+                stats->startTime, stats->endTime,
                 buffer, &buffer[sizeof(buffer)/2] );
     } else {
         // UDP Reporting
-        printf( report_sum_bw_jitter_loss_format, 
-                stats->startTime, stats->endTime, 
+        printf( report_sum_bw_jitter_loss_format,
+                stats->startTime, stats->endTime,
                 buffer, &buffer[sizeof(buffer)/2],
                 stats->jitter*1000.0, stats->cntError, stats->cntDatagrams,
                 (100.0 * stats->cntError) / stats->cntDatagrams );
         if ( stats->cntOutofOrder > 0 ) {
             printf( report_sum_outoforder,
-                    stats->startTime, 
+                    stats->startTime,
                     stats->endTime, stats->cntOutofOrder );
         }
     }
     if ( stats->free == 1 && stats->mUDP == (char)kMode_Client ) {
-        printf( report_sum_datagrams, stats->cntDatagrams ); 
+        printf( report_sum_datagrams, stats->cntDatagrams );
     }
 }
 
 /*
  * Prints server transfer reports in default style
  */
-void reporter_serverstats( Connection_Info *nused, Transfer_Info *stats ) {
+void reporter_serverstats( Connection_Info *nused, Transfer_Info *stats )
+{
     printf( server_reporting, stats->transferID );
     reporter_printstats( stats );
 }
@@ -152,17 +155,18 @@ void reporter_serverstats( Connection_Info *nused, Transfer_Info *stats ) {
 /*
  * Report the client or listener Settings in default style
  */
-void reporter_reportsettings( ReporterData *data ) {
+void reporter_reportsettings( ReporterData *data )
+{
     int win, win_requested;
 
     win = getsock_tcp_windowsize( data->info.transferID,
-                  (data->mThreadMode == kMode_Listener ? 0 : 1) );
+                                  (data->mThreadMode == kMode_Listener ? 0 : 1) );
     win_requested = data->mTCPWin;
 
     printf( "%s", separator_line );
     if ( data->mThreadMode == kMode_Listener ) {
         printf( server_port,
-                (isUDP( data ) ? "UDP" : "TCP"), 
+                (isUDP( data ) ? "UDP" : "TCP"),
                 data->mPort );
     } else {
         printf( client_port,
@@ -178,8 +182,8 @@ void reporter_reportsettings( ReporterData *data ) {
     }
 
     if ( isUDP( data ) ) {
-        printf( (data->mThreadMode == kMode_Listener ? 
-                                   server_datagram_size : client_datagram_size),
+        printf( (data->mThreadMode == kMode_Listener ?
+                 server_datagram_size : client_datagram_size),
                 data->mBufLen );
         if ( SockAddr_isMulticast( &data->connection.peer ) ) {
             printf( multicast_ttl, data->info.mTTL);
@@ -187,8 +191,8 @@ void reporter_reportsettings( ReporterData *data ) {
     }
     byte_snprintf( buffer, sizeof(buffer), win,
                    toupper( data->info.mFormat));
-    printf( "%s: %s", (isUDP( data ) ? 
-                                udp_buffer_size : tcp_window_size), buffer );
+    printf( "%s: %s", (isUDP( data ) ?
+                       udp_buffer_size : tcp_window_size), buffer );
 
     if ( win_requested == 0 ) {
         printf( " %s", window_default );
@@ -204,51 +208,52 @@ void reporter_reportsettings( ReporterData *data ) {
 /*
  * Report a socket's peer IP address in default style
  */
-void *reporter_reportpeer( Connection_Info *stats, int ID ) {
+void *reporter_reportpeer( Connection_Info *stats, int ID )
+{
     if ( ID > 0 ) {
         // copy the inet_ntop into temp buffers, to avoid overwriting
         char local_addr[ REPORT_ADDRLEN ];
         char remote_addr[ REPORT_ADDRLEN ];
         struct sockaddr *local = ((struct sockaddr*)&stats->local);
         struct sockaddr *peer = ((struct sockaddr*)&stats->peer);
-    
+
         if ( local->sa_family == AF_INET ) {
-            inet_ntop( AF_INET, &((struct sockaddr_in*)local)->sin_addr, 
+            inet_ntop( AF_INET, &((struct sockaddr_in*)local)->sin_addr,
                        local_addr, REPORT_ADDRLEN);
         }
 #ifdef HAVE_IPV6
-          else {
-            inet_ntop( AF_INET6, &((struct sockaddr_in6*)local)->sin6_addr, 
+        else {
+            inet_ntop( AF_INET6, &((struct sockaddr_in6*)local)->sin6_addr,
                        local_addr, REPORT_ADDRLEN);
         }
 #endif
-    
+
         if ( peer->sa_family == AF_INET ) {
-            inet_ntop( AF_INET, &((struct sockaddr_in*)peer)->sin_addr, 
+            inet_ntop( AF_INET, &((struct sockaddr_in*)peer)->sin_addr,
                        remote_addr, REPORT_ADDRLEN);
         }
 #ifdef HAVE_IPV6
-          else {
-            inet_ntop( AF_INET6, &((struct sockaddr_in6*)peer)->sin6_addr, 
+        else {
+            inet_ntop( AF_INET6, &((struct sockaddr_in6*)peer)->sin6_addr,
                        remote_addr, REPORT_ADDRLEN);
         }
 #endif
-    
+
         printf( report_peer,
                 ID,
                 local_addr,  ( local->sa_family == AF_INET ?
-                              ntohs(((struct sockaddr_in*)local)->sin_port) :
+                               ntohs(((struct sockaddr_in*)local)->sin_port) :
 #ifdef HAVE_IPV6
-                              ntohs(((struct sockaddr_in6*)local)->sin6_port)),
+                               ntohs(((struct sockaddr_in6*)local)->sin6_port)),
 #else
-                              0),
+                               0),
 #endif
                 remote_addr, ( peer->sa_family == AF_INET ?
-                              ntohs(((struct sockaddr_in*)peer)->sin_port) :
+                               ntohs(((struct sockaddr_in*)peer)->sin_port) :
 #ifdef HAVE_IPV6
-                              ntohs(((struct sockaddr_in6*)peer)->sin6_port)));
+                               ntohs(((struct sockaddr_in6*)peer)->sin6_port)));
 #else
-                              0));
+                               0));
 #endif
     }
     return NULL;
@@ -264,7 +269,8 @@ void *reporter_reportpeer( Connection_Info *stats, int ID ) {
 
 #define checkMSS_MTU( inMSS, inMTU ) (inMTU-40) >= inMSS  &&  inMSS >= (inMTU-80)
 
-void reporter_reportMSS( int inMSS, thread_Settings *inSettings ) {
+void reporter_reportMSS( int inMSS, thread_Settings *inSettings )
+{
     if ( inMSS <= 0 ) {
         printf( report_mss_unsupported, inSettings->mSock );
     } else {

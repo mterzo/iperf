@@ -31,9 +31,9 @@
  */
 
 #ifndef _GETOPT_H
-    #define _GETOPT_H 1
+#define _GETOPT_H 1
 
-    #ifdef	__cplusplus
+#ifdef	__cplusplus
 extern "C" {
 #endif
 
@@ -131,6 +131,6 @@ int _gnu_getopt_internal( int argc,
 
 #ifdef	__cplusplus
 } /* end extern "C" */
-    #endif
+#endif
 
 #endif /* _GETOPT_H */
